@@ -2,6 +2,7 @@ import requests
 import base64
 from PIL import Image
 import io
+import json
 from clarifai.rest import ClarifaiApp
 from django.shortcuts import render
 from .forms import ImageForm
@@ -22,43 +23,43 @@ def index(request):
       ibm = 'IBM' in data.get('competitors')
       amazon = 'Amazon' in data.get('competitors')
       if imgurl:
-        app = ClarifaiApp()
-        c='working'#c = {'tags' : app.tag_urls(urls=[imgurl], model=clarifai_model)}
+        clarifai_predict = ClarifaiApp()
+        c='working'#c = {'tags' : clarifai_predict.tag_urls(urls=[imgurl], model=clarifai_model)}
 
         # image = Image.open(io.BytesIO(requests.get(imgurl).content))
         # if image.width > 
         
-        resp = None
+        g_resp = None
+        i_resp = None
         if google:
-          resp = requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl))
-          print resp.content
-          print resp.headers
-          print resp.reason
+          g_resp = 'working' #resp = requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl))
+        if ibm:
+          i_resp = 
 
         results = [
-          {'company':'clarifai', 'tags': c,},
-          {'company':'google', 'tags': resp,} 
+          {'company':'Clarifai', 'tags': c,},
+          {'company':'Google', 'tags': g_resp,},
+          {'company':'IBM', 'tags': i_resp,},
         ]
 
         return render(request, 'index.html', {'form': form, 'results': results})
 
 
 def build_google(imgurl):
-  req = {
-    "requests": [
-      {
-        "image":{
-          "source":{
-            "imageUri": imgurl
-          }
-        },
-        "features":[
-          {
-            "type":"LABEL_DETECTION",
-            "maxResults":1
-          }
-        ],
+  req_list = [
+    {
+      "image":{
+        "source":{
+          "imageUri": imgurl
+        }
       },
-    ],
-  }
+      "features":[
+        {
+          "type":"LABEL_DETECTION",
+          "maxResults":20
+        }
+      ]
+    }
+  ] 
+  req = json.dumps({'requests': req_list})
   return req
