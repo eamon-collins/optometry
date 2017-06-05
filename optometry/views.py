@@ -4,6 +4,7 @@ from PIL import Image
 import io
 import json
 from clarifai.rest import ClarifaiApp
+from watson_developer_cloud import VisualRecognitionV3
 from django.shortcuts import render
 from .forms import ImageForm
 from secrets import *
@@ -22,25 +23,32 @@ def index(request):
       google = 'Google' in data.get('competitors')
       ibm = 'IBM' in data.get('competitors')
       amazon = 'Amazon' in data.get('competitors')
+      results = []
       if imgurl:
-        clarifai_predict = ClarifaiApp()
-        c='working'#c = {'tags' : clarifai_predict.tag_urls(urls=[imgurl], model=clarifai_model)}
+        # clarifai_predict = ClarifaiApp()
+        # clarifai_resp = clarifai_predict.tag_urls(urls=[imgurl], model=clarifai_model)
+        # c = []
+        # for tag in clarifai_resp['outputs'][0]['data']['concepts']:
+        #   c.append({'tag': tag['name'], 'score': tag['value']})
+        # results.append({'company':'Clarifai', 'tags': c,})
 
-        # image = Image.open(io.BytesIO(requests.get(imgurl).content))
-        # if image.width > 
-        
-        g_resp = None
-        i_resp = None
+
         if google:
-          g_resp = 'working' #resp = requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl))
+          g = []
+          google_resp = json.loads(requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl)).content)
+          for tag in google_resp['responses'][0]['labelAnnotations']:
+            g.append({'tag': tag['description'], 'score': tag['score']})
+          results.append({'company':'Google', 'tags': g})
         if ibm:
-          i_resp = 
-
-        results = [
-          {'company':'Clarifai', 'tags': c,},
-          {'company':'Google', 'tags': g_resp,},
-          {'company':'IBM', 'tags': i_resp,},
-        ]
+          i = []
+          ibm_predict = VisualRecognitionV3('2016-05-20', api_key= IBM_API_KEY)
+          ibm_resp = ibm_predict.classify(images_url=imgurl)
+          for tag in ibm_resp['images'][0]['classifiers'][0]['classes']:
+            i.append({'tag': tag['class'], 'score': tag['score']})
+          i = sorted(i, key=lambda tag: tag['score'], reverse=True)
+          results.append({'company':'IBM', 'tags': i})
+        if amazon:
+          
 
         return render(request, 'index.html', {'form': form, 'results': results})
 
