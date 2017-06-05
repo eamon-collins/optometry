@@ -8,6 +8,7 @@ API_CHOICES = (
 	('Google','Google'),
 	('IBM','IBM'),
 	('Amazon','Amazon'),
+	('Microsoft','Microsoft')
 	)
 
 class ImageForm(forms.Form):
