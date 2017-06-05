@@ -27,6 +27,12 @@ def index(request):
       amazon = 'Amazon' in data.get('competitors')
       microsoft = 'Microsoft' in data.get('competitors')
       results = []
+
+      #if layout test is checked, return requested tables with preset, fake data
+      layout_test = data.get('layout_test')
+      if layout_test:
+        return render(request, 'index.html', {'form': form, 'results': layout_test_data(google, ibm, amazon, microsoft)})
+
       if imgurl:
         #construct base64 and bytes encoded copies of image for services that can/need to use them
         image = requests.get(imgurl).content
@@ -43,8 +49,8 @@ def index(request):
         #Google Cloud Vision handler
         if google:
           g = []
-          #google_resp = json.loads(requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl)).content)
-          google_resp = {"responses": [{"labelAnnotations": [{"mid": "/m/01f4td","description": "rural area","score": 0.6766008},{"mid": "/m/01f4td","description": "norse","score": 0.5643342},]}]}
+          google_resp = json.loads(requests.post('https://vision.googleapis.com/v1/images:annotate?key='+GOOGLE_API_KEY, data=build_google(imgurl)).content)
+          #google_resp = {"responses": [{"labelAnnotations": [{"mid": "/m/01f4td","description": "rural area","score": 0.6766008},{"mid": "/m/01f4td","description": "norse","score": 0.5643342},]}]}
           for tag in google_resp['responses'][0]['labelAnnotations']:
             g.append({'tag': tag['description'], 'score': tag['score']})
           results.append({'company':'Google', 'tags': g})
@@ -75,6 +81,10 @@ def index(request):
           for tag in microsoft_resp['tags']:
             m.append({'tag': tag['name'], 'score': tag['confidence']})
           results.append({'company': 'Microsoft', 'tags': m})
+        
+        f = open('sample_output.txt', 'w')
+        f.write(repr(results))
+        f.close()
 
         return render(request, 'index.html', {'form': form, 'results': results})
 
@@ -124,5 +134,16 @@ def build_amazon(b64image):
   return json.loads(requests.post(endpoint, data=request_params, headers=headers).content)
 
 
-
+def layout_test_data(google, ibm, amazon, microsoft):
+  results = []
+  results.append({'company': 'Clarifai', 'tags': [{'tag': u'summer', 'score': 0.98168695}, {'tag': u'nature', 'score': 0.97212166}, {'tag': u'farm', 'score': 0.9689047}, {'tag': u'grass', 'score': 0.95977676}, {'tag': u'outdoors', 'score': 0.9521229}, {'tag': u'field', 'score': 0.9091958}, {'tag': u'rural', 'score': 0.9091601}, {'tag': u'leisure', 'score': 0.8994857}, {'tag': u'pasture', 'score': 0.8972074}, {'tag': u'family', 'score': 0.89348996}, {'tag': u'agriculture', 'score': 0.8800632}, {'tag': u'beautiful', 'score': 0.87906086}, {'tag': u'outside', 'score': 0.8564824}, {'tag': u'countryside', 'score': 0.85345554}, {'tag': u'young', 'score': 0.85037076}, {'tag': u'one', 'score': 0.84531885}, {'tag': u'hayfield', 'score': 0.8412552}, {'tag': u'mammal', 'score': 0.8277488}, {'tag': u'tree', 'score': 0.8218796}, {'tag': u'flower', 'score': 0.80977535}]})
+  if google:
+    results.append({'company': 'Google', 'tags': [{'tag': u'rural area', 'score': 0.6766008}, {'tag': u'farm', 'score': 0.6482424}, {'tag': u'meadow', 'score': 0.59396565}, {'tag': u'horse like mammal', 'score': 0.51159537}]})
+  if ibm:
+    results.append({'company': 'IBM', 'tags': [{'tag': u'green color', 'score': 0.963}, {'tag': u'animal', 'score': 0.765}, {'tag': u'mammal', 'score': 0.653}, {'tag': u'domestic animal', 'score': 0.653}, {'tag': u'dog', 'score': 0.652}, {'tag': u'ruminant', 'score': 0.603}, {'tag': u'deer', 'score': 0.602}, {'tag': u'vizsla dog', 'score': 0.569}, {'tag': u'Great Dane dog', 'score': 0.558}, {'tag': u'person', 'score': 0.55}, {'tag': u'boy at farm', 'score': 0.549}, {'tag': u'palomino horse', 'score': 0.53}]})
+  if amazon:
+    results.append({'company': 'Amazon', 'tags': [{'tag': u'Human', 'score': 99.30406951904297}, {'tag': u'People', 'score': 99.30635070800781}, {'tag': u'Person', 'score': 99.30635070800781}, {'tag': u'Backyard', 'score': 77.3866958618164}, {'tag': u'Yard', 'score': 77.3866958618164}, {'tag': u'Ivy', 'score': 76.58114624023438}, {'tag': u'Plant', 'score': 76.58114624023438}, {'tag': u'Vine', 'score': 76.58114624023438}, {'tag': u'Shorts', 'score': 75.4872055053711}, {'tag': u'Blossom', 'score': 67.45735168457031}, {'tag': u'Flora', 'score': 67.45735168457031}, {'tag': u'Flower', 'score': 67.45735168457031}, {'tag': u'Herbal', 'score': 63.904659271240234}, {'tag': u'Herbs', 'score': 63.904659271240234}, {'tag': u'Planter', 'score': 63.904659271240234}]})
+  if microsoft:
+    results.append({'company': 'Microsoft', 'tags': [{'tag': u'tree', 'score': 0.9998617172241211}, {'tag': u'outdoor', 'score': 0.999527096748352}, {'tag': u'grass', 'score': 0.9965176582336426}, {'tag': u'standing', 'score': 0.8547968864440918}, {'tag': u'house', 'score': 0.4055963158607483}]})
+  return results
 

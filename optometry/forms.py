@@ -12,7 +12,8 @@ API_CHOICES = (
 	)
 
 class ImageForm(forms.Form):
-	imgurl = forms.CharField(max_length=250)
+	layout_test = forms.BooleanField(required=False, initial=True)
+	imgurl = forms.CharField(required=False, max_length=250)
 	#image = forms.ImageField()
 	clarifai_model = forms.ChoiceField(choices=CLARIFAI_MODEL_CHOICES)
 	competitors = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=API_CHOICES)
