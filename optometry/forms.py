@@ -19,4 +19,4 @@ class ImageForm(forms.Form):
 	imgurl = forms.CharField(required=False, max_length=250)
 	#image = forms.ImageField()
 	clarifai_model = forms.ChoiceField(choices=CLARIFAI_MODEL_CHOICES)
-	competitors = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=API_CHOICES)
+	competitors = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple, choices=API_CHOICES)

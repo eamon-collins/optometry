@@ -53,11 +53,9 @@ def index(request):
         timeit of client call: 1.557797
         """
 
-
         clarifai_predict = ClarifaiApp()
         start = timer()
         clarifai_resp = clarifai_predict.tag_urls(urls=[imgurl], model=clarifai_model)
-        print clarifai_resp
         end = timer()
         elapsed = round(end - start, 3)
         c = []
@@ -91,6 +89,8 @@ def index(request):
           results.append(build_microsoft(imgurl))
 
         return render(request, 'index.html', {'form': form, 'results': results})
+    else:
+      return render(request, 'index.html', {'form': form, 'error_msg': 'The form was not valid'})
 
 
 def build_google(imgurl):
@@ -172,7 +172,7 @@ def build_amazon(b64image):
   a = []
   resp = json.loads(resp.content)
   for tag in resp['Labels']:
-    a.append({'tag': tag['Name'], 'score': tag['Confidence']})
+    a.append({'tag': tag['Name'], 'score': tag['Confidence'] / 100})
   return {'company':'Amazon', 'tags': a, 'elapsed': elapsed}
 
 def sign_amazon(date, region, service, string_to_sign):

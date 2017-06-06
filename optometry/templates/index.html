@@ -9,6 +9,7 @@
 <div class="container">
 	<div class="col-sm-1 left"></div>
 	<div class="col-sm-5 left">
+  {{ error_msg }}
 		<form method='post' action='/'>
 			{% csrf_token %}
 		  {% for field in form %}
