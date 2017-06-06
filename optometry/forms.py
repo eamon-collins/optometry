@@ -1,7 +1,10 @@
 from django import forms
 
 CLARIFAI_MODEL_CHOICES = (
-	('general-v1.3','general-v1.3'),
+	('general-v1.3','General'),
+	('travel-v1.0','Travel'),
+	('food-items-v1.0','Food'),
+	('nsfw-v1.0','NSFW'),
 	)
 
 API_CHOICES = (

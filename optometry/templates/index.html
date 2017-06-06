@@ -35,6 +35,7 @@
         </div>
           
         <table class="list-group">
+          <tr class = "list-group-item"><td>Time to analyze: </td><td>{{ company.elapsed }}</td></tr>
           {% for tag in company.tags %}
             <tr class="list-group-item"><td>{{ tag.tag }}</td><td>{{ tag.score }}</td></tr>
           {% endfor %}
