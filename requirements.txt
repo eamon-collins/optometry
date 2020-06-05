@@ -2,7 +2,7 @@ certifi==2017.4.17
 chardet==3.0.3
 clarifai==2.0.20
 configparser==3.5.0
-Django==1.11.2
+Django==1.11.29
 functools32==3.2.3.post2
 future==0.15.2
 idna==2.5
